@@ -1,21 +1,21 @@
 const User = require('../model/User')
-const jwt = require('jsonwebtoken');
+
 const bcrypt = require('bcrypt');
 
 // Register a new user
 const registerUser = async (req, res) => {
-    const { username, password } = req.body;
+    const { name, email, password, phone } = req.body;
 
     // Validate input
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
     }
 
     try {
-        // Check if the username already exists
-        const existingUser = await User.findOne({ where: { username } });
+        // Check if the email already exists
+        const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
-            return res.status(400).json({ error: 'Username already exists' });
+            return res.status(400).json({ error: 'User with this email already exists' });
         }
 
         // Hash the password
@@ -23,12 +23,20 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // Create the user
-        const newUser = await User.create({ username, password: hashedPassword });
+        const newUser = await User.create({ name, email, password: hashedPassword, phone });
 
-        res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
+        // Remove the password before sending the user object
+        delete newUser.dataValues.password;
+
+        // Send the user object and the message
+        res.status(201).json({
+            success: true,
+            user: newUser.dataValues,
+            message: 'User registered successfully'
+        });
+    }
+    catch (error) {
         console.error(error);
-        console.log(error)
         res.status(500).json({ error: 'Failed to register user' });
     }
 };
@@ -36,37 +44,49 @@ const registerUser = async (req, res) => {
 
 // Login an existing user
 const loginUser = async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     // Validate input
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
+    if (!email || !password) {
+        return res.status(400).json({
+            error: 'Email and password are required'
+        });
     }
 
     try {
-        // Find the user by username
-        const user = await User.findOne({ where: { username } });
+        // Find the user by email
+        const user = await User.findOne({
+            where: { email }
+        });
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({
+                error: 'User not found'
+            });
         }
 
         // Verify the password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({
+                error: 'Invalid credentials'
+            });
         }
 
-        // Generate a JWT token
-        const token = jwt.sign(
-            { id: user.id, username: user.username },
-            process.env.JWT_SECRET || 'JKHSDKJBKJSDJSDJKBKSD345345345345',
-            { expiresIn: '24h' }
-        );
+        // // Generate a JWT token
+        // const token = jwt.sign(
+        //     { id: user.id, username: user.username },
+        //     process.env.JWT_SECRET || 'JKHSDKJBKJSDJSDJKBKSD345345345345',
+        //     { expiresIn: '24h' }
+        // );
+
+        // Remove password before sending to frontend
+        delete user.dataValues.password;
 
         res.status(200).json({
+            success: true,
             message: 'Login successful',
-            token,
-            user: { id: user.id, username: user.username }
+            // token,
+            user: user.dataValues
         });
     } catch (error) {
         console.error(error);
@@ -77,22 +97,24 @@ const loginUser = async (req, res) => {
 
 
 
-// const getUser = async(req, res)=>{
+const getUser = async(req, res)=>{
 
-//     try{
-//         const tests = await User.findAll();
-//         res.status(200).json(tests);
+    try{
+        const tests = await User.findAll();
+        res.status(200).json(tests);
 
-//     }
-//     catch(error){
-//         res.status(500).json({error: "Failed to Load"})
-//     }
-// }
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to Load"})
+    }
+}
+
+
 
 // const createUser = async(req, res)=>{
-    
+
 //     try{
-        
+
 // const {username, password} = req.body;
 
 // //Hash the password
@@ -135,4 +157,4 @@ const loginUser = async (req, res) => {
 
 // module.exports = {createUser, getUser, deleteUser, updateUser}
 
-module.exports = {loginUser, registerUser}
+module.exports = { loginUser, registerUser,getUser }

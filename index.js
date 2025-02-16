@@ -3,7 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const sequelize = require('./database/db');
-const userRoute = require('./routes/userRoute')
+const userRoute = require('./routes/userRoute');
+const propertyRoute = require('./routes/propertyRoute');
+const cloudinary = require('./config/cloudinaryConfig');
+const rentalRoute = require('./routes/rentalPropertyRoute');
 
 //Creating a Server
 const app = express();
@@ -16,18 +19,18 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+// Authentication routes
+app.use('/api/auth', userRoute)
 
-app.get('/login',(req, res)=>{
-    res.send("Welcome to the web page")
-})
+// Property routes
+app.use('/api/property', propertyRoute)
 
+//rentalProperty routes
+app.use('/api/rentalProperty',rentalRoute)
 
-app.use('/users', userRoute);
 
 
 //Running on PORT
 app.listen(PORT, ()=>{
     console.log(`Server Running on........................ PORT ${PORT}`)
 })
-
-

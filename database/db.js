@@ -1,6 +1,7 @@
+require('dotenv').config();
 const { Sequelize } = require("sequelize");
 
-const sequelize = new Sequelize('Test1', 'postgres', 'admin123',{
+const sequelize = new Sequelize('OriginHomes', 'postgres', 'admin123',{
 
     host: 'localhost',
     dialect: 'postgres',
@@ -11,7 +12,10 @@ const sequelize = new Sequelize('Test1', 'postgres', 'admin123',{
 async function testConnection() {
     try{
         await sequelize.authenticate();
-        console.log('DB connection successful............................')
+        console.log('DB connection successful............................');
+        
+        await sequelize.sync({ alter: true }); 
+        console.log('✅ Database synced');
     }
     catch(error){
         console.error('Unable to connect to the database...............', error)
@@ -21,3 +25,4 @@ async function testConnection() {
 testConnection()
 
 module.exports = sequelize;
+
