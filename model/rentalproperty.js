@@ -2,61 +2,61 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../database/db');
 
 const RentalProperty = sequelize.define('RentalProperties', {
-    Rid: {
+    id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    RsellerId: {
+    sellerId: {
         type: DataTypes.UUID,
         allowNull: false,
     },
-    RownerName: {
+    ownerName: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    RpropertyLocation: {
+    propertyLocation: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    RpropertyType: {
+    propertyType: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    RpropertyTitle: {
+    propertyTitle: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    RphoneNumber: {
+    phoneNumber: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
             isNumeric: true,
         }
     },
-    Rprice: {
-        type: DataTypes.DECIMAL(10, 2),
+    price: {
+        type: DataTypes.DECIMAL(12, 2), // Changed from 10,2 to 12,2 to store up to 1 billion (999,999,999,999.99)
         allowNull: false,
         validate: {
             isDecimal: true,
         }
     },
-    Rdescription: {
+    description: {
         type: DataTypes.TEXT,
         allowNull: true,
     },
-    RpropertyImage: {
+    propertyImage: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    RpropertyFeatures: {
+    propertyFeatures: {
         type: DataTypes.TEXT,
         allowNull: true,
     },
-    Rstatus: {
+    status: {
         type: DataTypes.ENUM,
-        values: ['onSale', 'sold', 'rented'],
-        defaultValue: 'onSale',
+        values: ['onRent','rented'],
+        defaultValue: 'onRent',
         allowNull: false
     }
 });
