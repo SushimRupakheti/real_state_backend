@@ -8,7 +8,6 @@ const sequelize = new Sequelize('OriginHomes', 'postgres', 'admin123',{
     port: 5432,
     logging: false,
 });
-
 async function testConnection() {
     try{
         await sequelize.authenticate();
@@ -23,6 +22,5 @@ async function testConnection() {
 }    
 }
 testConnection()
-
 module.exports = sequelize;
 
