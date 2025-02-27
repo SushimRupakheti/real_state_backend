@@ -236,3 +236,4 @@ const updateProperty = async (req, res) => {
 module.exports = {
     sellProperty,buyProperty,getAllOnSaleProperties,getPropertyBySeller,deleteProperty,updateProperty
 };
+
